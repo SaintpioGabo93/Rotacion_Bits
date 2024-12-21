@@ -9,7 +9,7 @@
 
 ;Configuracion del pic y todas sus palabras claves
     list p=16f628a
-    #include "/opt/microchip/mplabx/v5.20/mpasmx/p16lf628a.inc"
+    #include "/opt/microchip/mplabx/v5.20/mpasmx/p16f628a.inc"
     
 ;Iniciamos el programa
     bsf		STATUS, 5 ; Vamos al banco 1
@@ -29,7 +29,14 @@ inicio:
     
 ;Llamamos a nuestra funcion del archivo separado
     call	delay_ms
-    decfsz	conta, 1  ;
-    ; RECORDATORIO, DEBEMOS COPIAR EL ARCHIVO DE LA SUBRUTINA DEL DELAY AQUI
+    decfsz	conta, 1  ; Decrementamos el contenido del registro F en uno y si nos da cero salta una instruccion
+    goto	$+2	  ; Saltamos dos instrucciones mas adelante para llgar a bsf STATUS, 0
+    goto	inicio	  ; Vamos a inicio 
+    bsf		STATUS, 0 ; Con esto nos aseguramos que C = 1, para cuando se roten los bits
+    rlf		PORTB, 1  ; Rotamos los bits
+    goto	$-7	  ; Regresamos 7 instrucciones que serian los milisegundos
+    
+;Incluimos la libreria para el delay
+    #include <delay.inc>
     
     end
