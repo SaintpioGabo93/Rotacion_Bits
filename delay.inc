@@ -1,20 +1,43 @@
-; Este sólo fuciona para un oscilador de 4Mhz
+; VARIABLES
+ cblock 0x30
+    TEMP1               ; Variable temporal
+    TEMP2
+    TEMP3
+ endc
 
-cblock		
-   temp1		
-endc		
-
-; Parte de la función para que el bucle del milisegundo se ejecute 100 veces
-delay_ms:
-    movwf   temp1      
-    call    delay_1ms  
-    decfsz  temp1, 1   
-    goto    $-2        
+ ; RUTINAS
+DELAY_S:
+    movwf 		TEMP3
+DELAY_S_LOOP:
+    call 		DELAY_1S
+    decfsz 		TEMP3, F
+    goto 		DELAY_S_LOOP
     return
 
-; Creamos el bucle para contar el milisegundo
-delay_1ms:
-    clrf    TMR0      
-    btfss   TMR0, 2   
-    goto    $-1       
-    return            
+DELAY_1S:
+    movlw 		.250
+    call 		DELAY_MS
+    movlw 		.250
+    call 		DELAY_MS
+    movlw 		.250
+    call 		DELAY_MS
+    movlw 		.250
+    call 		DELAY_MS
+    return
+
+DELAY_MS:
+    movwf 		TEMP1         ; 1 us
+DELAY_MS_LOOP:
+    call 		DELAY_1MS      ; 2 us + 995 us
+    decfsz 		TEMP1, F     ; 1 us
+    goto 		DELAY_MS_LOOP  ; 2 us
+    return
+
+DELAY_1MS:
+    movlw 		.247          ; 1 us
+    movwf 		TEMP2         ; 1 us
+DELAY_1MS_LOOP:
+    nop                 ; 1 us
+    decfsz 		TEMP2, F     ; 1 us
+    goto 		DELAY_1MS_LOOP ; 2 us
+    return
